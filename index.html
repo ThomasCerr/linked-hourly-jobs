@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LinkedIn Job URL Generator</title>
+  <meta name="description" content="Build precise LinkedIn job search URLs with all filters, including custom date posted by hours or a specific time today." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>LinkedIn Job URL Generator</h1>
+    <p class="sub">Create shareable LinkedIn job search links with granular filters. Supports <strong>custom hours</strong> or <strong>specific time today</strong> for “Date posted”.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Search Basics</h2>
+      <div class="grid">
+        <label>
+          <span>Keywords</span>
+          <input id="keywords" type="text" placeholder="e.g., data analyst OR (product AND analytics)">
+        </label>
+        <label>
+          <span>Location</span>
+          <input id="location" type="text" placeholder="e.g., Richmond, VA">
+        </label>
+        <label>
+          <span>Country/Region Code (optional)</span>
+          <input id="geo" type="text" placeholder="e.g., us">
+        </label>
+        <label>
+          <span>Start (pagination)</span>
+          <input id="start" type="number" min="0" value="0">
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Date Posted</h2>
+      <div class="date-grid">
+        <label class="row">
+          <input type="radio" name="dateMode" value="any" checked>
+          <span>Any time</span>
+        </label>
+
+        <label class="row">
+          <input type="radio" name="dateMode" value="lookback">
+          <span>Last</span>
+          <input id="lookbackValue" type="number" min="1" placeholder="e.g., 6" class="inline-input" disabled>
+          <select id="lookbackUnit" class="inline-input" disabled>
+            <option value="hours">hours</option>
+            <option value="days">days</option>
+          </select>
+        </label>
+
+        <label class="row">
+          <input type="radio" name="dateMode" value="sinceTime">
+          <span>Since today at</span>
+          <input id="sinceHH" type="number" min="0" max="23" placeholder="HH" class="inline-input" disabled>
+          <input id="sinceMM" type="number" min="0" max="59" placeholder="MM" class="inline-input" disabled>
+          <select id="tz" class="inline-input" disabled>
+            <option value="America/New_York">America/New_York</option>
+            <option value="America/Chicago">America/Chicago</option>
+            <option value="America/Denver">America/Denver</option>
+            <option value="America/Los_Angeles">America/Los_Angeles</option>
+            <option value="UTC">UTC</option>
+          </select>
+        </label>
+      </div>
+      <p class="help">LinkedIn uses <code>f_TPR=r&lt;seconds&gt;</code> (relative seconds) for the “Date posted” filter. The generator calculates the seconds for you.</p>
+    </section>
+
+    <section class="card">
+      <h2>Filters</h2>
+      <div class="grid">
+        <label>
+          <span>Work Type (multi)</span>
+          <select id="f_WT" multiple>
+            <option value="1">On-site</option>
+            <option value="2">Remote</option>
+            <option value="3">Hybrid</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Experience (multi)</span>
+          <select id="f_E" multiple>
+            <option value="">Any</option>
+            <option value="1">Internship</option>
+            <option value="2">Entry level</option>
+            <option value="3">Associate</option>
+            <option value="4">Mid-Senior</option>
+            <option value="5">Director</option>
+            <option value="6">Executive</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Job Type (multi)</span>
+          <select id="f_JT" multiple>
+            <option value="F">Full-time</option>
+            <option value="P">Part-time</option>
+            <option value="C">Contract</option>
+            <option value="T">Temporary</option>
+            <option value="I">Internship</option>
+            <option value="V">Volunteer</option>
+            <option value="O">Other</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Easy Apply</span>
+          <select id="f_AL">
+            <option value="">Any</option>
+            <option value="true">Yes</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Company IDs (comma-separated)</span>
+          <input id="f_C" type="text" placeholder="e.g., 2076,1441">
+          <small>LinkedIn requires numeric company IDs for this filter.</small>
+        </label>
+
+        <label>
+          <span>Industry Codes (comma-separated)</span>
+          <input id="f_I" type="text" placeholder="e.g., 6,96">
+          <small>Uses LinkedIn industry codes (optional/advanced).</small>
+        </label>
+
+        <label>
+          <span>On-site Radius (miles)</span>
+          <input id="distance" type="number" min="0" placeholder="e.g., 25">
+        </label>
+
+        <label>
+          <span>Sort</span>
+          <select id="sortBy">
+            <option value="">Default</option>
+            <option value="DD">Most recent</option>
+            <option value="R">Relevance</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Result</h2>
+      <div class="actions">
+        <button id="buildBtn">Generate URL</button>
+        <button id="openBtn" disabled>Open in new tab</button>
+        <button id="copyBtn" disabled>Copy URL</button>
+        <span id="copied" role="status" aria-live="polite"></span>
+      </div>
+      <div id="urlBox" class="url-box" tabindex="0"></div>
+      <details class="tech">
+        <summary>Included parameters (debug)</summary>
+        <pre id="debug"></pre>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>How the time filter works</h2>
+      <ol>
+        <li><strong>Last N hours/days</strong>: converts to seconds (<em>N×3600</em> or <em>N×86400</em>) → <code>f_TPR=r&lt;seconds&gt;</code>.</li>
+        <li><strong>Since today at HH:MM</strong>: computes the seconds between “now” and today at HH:MM in your chosen timezone, then uses <code>f_TPR=r&lt;seconds&gt;</code>.</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built for power users. No tracking, all client‑side.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
