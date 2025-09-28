@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>⚡ LinkedIn Hourly Job Search Link Generator</title>
+  <meta name="description" content="Build LinkedIn job search links with precise hourly filters. Super fast. Super simple. Totally free." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>⚡ LinkedIn Hourly Job Search Link Generator</h1>
+    <p class="sub">Build LinkedIn job search links with precise hourly filters. Super fast. Super simple. Totally free.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Search Basics</h2>
+      <div class="grid">
+        <label>
+          <span>Keywords</span>
+          <input id="keywords" type="text" placeholder="e.g., Data Analyst, Product Analytics">
+        </label>
+        <label>
+          <span>Location</span>
+          <input id="location" type="text" placeholder="e.g., Richmond, VA">
+        </label>
+        <label>
+          <span>Country/Region Code (optional)</span>
+          <input id="geo" type="text" placeholder="e.g., us">
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Date Posted</h2>
+      <div class="date-options">
+        <label class="option">
+          <input type="radio" name="dateMode" value="any" checked>
+          <span>Any time</span>
+        </label>
+
+        <label class="option">
+          <input type="radio" name="dateMode" value="lookback">
+          <span>Last</span>
+          <input id="lookbackValue" type="number" min="1" placeholder="e.g., 6" class="small-input" disabled>
+          <select id="lookbackUnit" class="small-input" disabled>
+            <option value="hours">hours</option>
+            <option value="days">days</option>
+          </select>
+        </label>
+
+        <label class="option">
+          <input type="radio" name="dateMode" value="sinceTime">
+          <span>Since today at</span>
+          <input id="sinceHH" type="number" min="0" max="23" placeholder="HH" class="small-input" disabled>
+          <input id="sinceMM" type="number" min="0" max="59" placeholder="MM" class="small-input" disabled>
+          <select id="tz" class="small-input" disabled>
+            <option value="America/New_York">America/New_York</option>
+            <option value="America/Chicago">America/Chicago</option>
+            <option value="America/Denver">America/Denver</option>
+            <option value="America/Los_Angeles">America/Los_Angeles</option>
+            <option value="UTC">UTC</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Filters</h2>
+      <div class="grid">
+        <label>
+          <span>Work Type</span>
+          <select id="f_WT" multiple>
+            <option value="">Any</option>
+            <option value="1">On-site</option>
+            <option value="2">Remote</option>
+            <option value="3">Hybrid</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Experience Level</span>
+          <select id="f_E" multiple>
+            <option value="">Any</option>
+            <option value="1">Internship</option>
+            <option value="2">Entry level</option>
+            <option value="3">Associate</option>
+            <option value="4">Mid-Senior</option>
+            <option value="5">Director</option>
+            <option value="6">Executive</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Job Type</span>
+          <select id="f_JT" multiple>
+            <option value="">Any</option>
+            <option value="F">Full-time</option>
+            <option value="P">Part-time</option>
+            <option value="C">Contract</option>
+            <option value="T">Temporary</option>
+            <option value="I">Internship</option>
+            <option value="V">Volunteer</option>
+            <option value="O">Other</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Easy Apply</span>
+          <select id="f_AL">
+            <option value="">Any</option>
+            <option value="true">Yes</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Company IDs (comma-separated)</span>
+          <input id="f_C" type="text" placeholder="e.g., 2076,1441">
+        </label>
+
+        <label>
+          <span>Industry Codes (comma-separated)</span>
+          <input id="f_I" type="text" placeholder="e.g., 6,96">
+        </label>
+
+        <label>
+          <span>Distance (miles)</span>
+          <input id="distance" type="number" min="0" placeholder="e.g., 25">
+        </label>
+
+        <label>
+          <span>Sort</span>
+          <select id="sortBy">
+            <option value="">Default</option>
+            <option value="DD">Most recent</option>
+            <option value="R">Relevance</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Result</h2>
+      <div class="actions">
+        <button id="buildBtn">Generate LinkedIn Job Link</button>
+        <button id="openBtn" disabled>Open in LinkedIn</button>
+        <button id="copyBtn" disabled>Copy URL</button>
+        <span id="copied" role="status" aria-live="polite"></span>
+      </div>
+      <div id="urlBox" class="url-box" tabindex="0"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Free LinkedIn search link builder. Client-side only, no tracking.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
